@@ -915,11 +915,10 @@ body {
 
 /* 월 */
 .mji-tl-month {
-  min-width: clamp(48px, 3vw + 22px, 64px);
+  min-width: clamp(44px, 3vw + 20px, 58px);
   font-size: clamp(14px, 0.5vw + 12px, 17px);
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: rgba(255, 255, 255, 0.2);
   transition: color 150ms;
   flex-shrink: 0;

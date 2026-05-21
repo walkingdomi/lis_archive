@@ -133,7 +133,10 @@ const Modal = dynamic(
 // Archive helpers
 // -----------------------------------------------------------------------------
 
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] as const
+function getSemester(dateStr: string): string {
+  const month = new Date(dateStr).getMonth() + 1 // 1-12
+  return month >= 3 && month <= 8 ? '1학기' : '2학기'
+}
 
 interface ArchiveItem {
   id: string
@@ -219,7 +222,7 @@ function getArchiveItems(
       const titleSegs: any[] = props.title || []
       const title = titleSegs.map((t: any) => t[0]).join('')
 
-      const monthStr = dateStr ? (MONTHS[new Date(dateStr).getMonth()] ?? '') : ''
+      const monthStr = dateStr ? getSemester(dateStr) : ''
 
       return {
         id: page.id,
