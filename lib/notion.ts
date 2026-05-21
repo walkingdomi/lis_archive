@@ -10,11 +10,15 @@ import pMemoize from 'p-memoize'
 import {
   isPreviewImageSupportEnabled,
   navigationLinks,
-  navigationStyle
+  navigationStyle,
+  rootNotionPageId
 } from './config'
 import { getTweetsMap } from './get-tweets'
 import { notion } from './notion-api'
 import { getPreviewImageMap } from './preview-images'
+
+// Archive DB page ID (collection ID without dashes = Notion page ID of the database)
+const ARCHIVE_COLLECTION_PAGE_ID = 'a880196f858882fe9989071abf333ce3'
 
 const getNavigationLinkPages = pMemoize(
   async (): Promise<ExtendedRecordMap[]> => {
@@ -44,6 +48,33 @@ const getNavigationLinkPages = pMemoize(
 
 export async function getPage(pageId: string): Promise<ExtendedRecordMap> {
   let recordMap = await notion.getPage(pageId)
+
+  // Root page has archive DB as linked reference — item blocks aren't fetched automatically.
+  // Explicitly call getCollectionData using a view from the already-loaded collection_view map.
+  if (pageId === rootNotionPageId) {
+    const ARCHIVE_COLLECTION_ID = 'a880196f-8588-82fe-9989-071abf333ce3'
+    const collectionViewId = Object.keys(recordMap.collection_view || {})[0]
+    if (collectionViewId) {
+      try {
+        const collectionView =
+          (recordMap.collection_view[collectionViewId] as any)?.value
+        const collectionData = await notion.getCollectionData(
+          ARCHIVE_COLLECTION_ID,
+          collectionViewId,
+          collectionView,
+          { limit: 999 }
+        )
+        const cdMap = (collectionData as any).recordMap
+        if (cdMap?.block) {
+          recordMap.block = { ...recordMap.block, ...cdMap.block }
+        }
+      } catch (e) {
+        console.warn('[Archive] Failed to fetch collection data:', e)
+      }
+    } else {
+      console.warn('[Archive] No collection_view entries found in recordMap')
+    }
+  }
 
   if (navigationStyle !== 'default') {
     // ensure that any pages linked to in the custom navigation header have

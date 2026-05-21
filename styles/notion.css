@@ -17,6 +17,7 @@
 }
 
 .notion-page {
+  padding-top: 68px !important;
   padding-bottom: calc(max(5vh, 32px)) !important;
   line-height: 1.65;
 }
@@ -153,6 +154,11 @@
     padding-left: 2vw;
     padding-right: 2vw;
   }
+}
+
+/* notion-search-button은 커스텀 헤더에서 직접 처리하므로 항상 숨김 */
+.notion-search-button {
+  display: none !important;
 }
 
 @media only screen and (max-width: 600px) {
@@ -402,4 +408,829 @@
 
 .notion-equation.notion-equation-block{
   align-items: center;
+}
+
+/* =============================================================================
+   다크 테마 변수 오버라이드
+   ============================================================================= */
+
+.dark-mode {
+  --bg-color: #0a0a0a !important;
+  --bg-color-0: rgba(255, 255, 255, 0.04) !important;
+  --bg-color-1: rgba(255, 255, 255, 0.06) !important;
+  --bg-color-2: rgba(255, 255, 255, 0.08) !important;
+  --fg-color: rgba(255, 255, 255, 0.87) !important;
+  --fg-color-0: rgba(255, 255, 255, 0.08) !important;
+  --fg-color-1: rgba(255, 255, 255, 0.46) !important;
+  --fg-color-2: rgba(255, 255, 255, 0.60) !important;
+  --fg-color-3: rgba(255, 255, 255, 0.40) !important;
+  --fg-color-4: rgba(255, 255, 255, 0.05) !important;
+  --fg-color-5: rgba(255, 255, 255, 0.025) !important;
+  --fg-color-6: rgba(255, 255, 255, 0.02) !important;
+}
+
+/* 서브페이지 헤더 다크 배경 */
+.dark-mode .notion-header {
+  background: rgba(10, 10, 10, 0.85) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  box-shadow: none !important;
+}
+
+@-moz-document url-prefix() {
+  .dark-mode .notion-header {
+    background: rgba(10, 10, 10, 0.95) !important;
+  }
+}
+
+/* =============================================================================
+   커스텀 헤더 (루트 + 서브페이지 공용)
+   ============================================================================= */
+
+.mji-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  height: 68px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.notion-header.mji-header {
+  height: 68px;
+}
+
+.mji-nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mji-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.mji-logo-badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.mji-logo-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: -0.02em;
+}
+
+.mji-nav-rhs {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* 헤더 우측 공통 버튼 스타일 (홈, 검색, 네비 링크) */
+.mji-nav-link,
+.mji-home-btn,
+.mji-search-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  text-decoration: none;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  padding: 0;
+  transition: color 200ms;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.mji-nav-link:hover,
+.mji-home-btn:hover,
+.mji-search-trigger:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.mji-search-trigger-label {
+  font-size: 13px;
+}
+
+.mji-search-trigger-clear {
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  flex-shrink: 0;
+  transition: color 150ms;
+}
+
+.mji-search-trigger-clear:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* 검색 모달 — portal로 body에 마운트 */
+.mji-search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: mji-overlay-in 160ms ease;
+}
+
+@keyframes mji-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.mji-search-modal {
+  width: min(600px, 80vw);
+  background: #1e1e1e;
+  border: 0.5px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  overflow: hidden;
+  animation: mji-modal-in 160ms ease;
+}
+
+@keyframes mji-modal-in {
+  from { transform: translateY(-10px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+.mji-search-modal-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.mji-search-modal-icon {
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.mji-search-modal-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 18px;
+  font-weight: 400;
+  caret-color: rgba(255, 255, 255, 0.8);
+  padding: 0;
+  min-width: 0;
+}
+
+.mji-search-modal-input::placeholder {
+  color: rgba(255, 255, 255, 0.22);
+}
+
+.mji-search-modal-clear {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  flex-shrink: 0;
+  transition: color 150ms;
+}
+
+.mji-search-modal-clear:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+
+/* =============================================================================
+   루트 페이지 레이아웃
+   ============================================================================= */
+
+body {
+  background: #0a0a0a;
+}
+
+.mji-root-page {
+  background: #0a0a0a;
+  color: rgba(255, 255, 255, 0.87);
+  min-height: 100vh;
+}
+
+/* =============================================================================
+   히어로 섹션
+   ============================================================================= */
+
+.mji-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background: #0a0a0a;
+  padding: 68px 2rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.mji-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 25% 50%, rgba(80, 60, 140, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 80%, rgba(30, 80, 140, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.mji-hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.mji-hero-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 0 1.5rem;
+}
+
+.mji-hero-title {
+  font-size: clamp(2.4rem, 5.5vw, 4.8rem);
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05em;
+}
+
+.mji-hero-sub {
+  font-size: clamp(13px, 0.4vw + 10px, 16px);
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 0 2rem;
+  line-height: 1.6;
+}
+
+.mji-hero-line {
+  display: block;
+  min-height: 1.18em;
+}
+
+.mji-cursor {
+  display: inline-block;
+  animation: mji-blink 1s step-end infinite;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 200;
+  margin-left: 2px;
+}
+
+.mji-cursor-done {
+  font-size: 0.6em;
+  vertical-align: middle;
+}
+
+@keyframes mji-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.mji-hero-buttons {
+  display: flex;
+  gap: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.mji-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 200ms;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mji-btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.mji-btn-outline:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mji-btn-primary {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  color: #0a0a0a;
+}
+
+.mji-btn-primary:hover {
+  background: white;
+  border-color: white;
+}
+
+
+/* =============================================================================
+   아카이브 섹션 (타임라인)
+   ============================================================================= */
+
+.mji-archive {
+  background: #0a0a0a;
+  padding: 6rem 0 8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mji-archive-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* 사이드바 */
+.mji-sidebar {
+  width: clamp(160px, 17vw, 220px);
+  flex-shrink: 0;
+  position: sticky;
+  top: 72px;
+  border-right: 0.5px solid rgba(255, 255, 255, 0.08);
+  padding: 28px clamp(12px, 1.5vw, 24px) 0 clamp(16px, 2vw, 32px);
+}
+
+.mji-sidebar-section {
+  margin-bottom: 2rem;
+}
+
+.mji-sidebar-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.28);
+  margin: 0 0 0.6rem 0.5rem;
+}
+
+.mji-sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mji-filter-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  font-size: clamp(12px, 0.4vw + 9px, 14px);
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 150ms;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+}
+
+.mji-filter-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.mji-filter-btn.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* 타임라인 메인 */
+.mji-timeline {
+  flex: 1;
+  min-width: 0;
+  padding: clamp(20px, 2vw + 8px, 32px) 0;
+}
+
+.mji-timeline-header {
+  padding: 0 clamp(20px, 2.5vw + 8px, 40px) clamp(12px, 1vw + 6px, 18px);
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.07);
+}
+
+.mji-tl-total {
+  font-size: clamp(10px, 0.4vw + 7px, 12px);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.22);
+}
+
+.mji-no-results {
+  color: rgba(255, 255, 255, 0.3);
+  padding: 4rem clamp(20px, 2.5vw + 8px, 40px);
+  font-size: 14px;
+}
+
+/* 연도 그룹 */
+.mji-year-row {
+  padding: clamp(12px, 1.2vw + 3px, 20px) clamp(20px, 2.5vw + 8px, 40px) clamp(6px, 0.6vw + 1px, 10px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.mji-year-label {
+  font-size: clamp(32px, 3vw + 20px, 56px);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.07);
+  line-height: 1;
+  transition: color 200ms;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.mji-year-group:hover .mji-year-label {
+  color: rgba(255, 255, 255, 0.13);
+}
+
+.mji-year-line {
+  flex: 1;
+  height: 0.5px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* 타임라인 카드 */
+.mji-tl-card {
+  display: flex;
+  align-items: center;
+  min-height: clamp(72px, 5vw + 30px, 96px);
+  padding: clamp(16px, 1.5vw + 8px, 26px) clamp(20px, 2.5vw + 8px, 40px);
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+  color: inherit;
+  transition: background 150ms;
+  gap: clamp(14px, 1.5vw + 5px, 24px);
+}
+
+.mji-tl-card-last {
+  border-bottom: none;
+}
+
+.mji-tl-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* 월 */
+.mji-tl-month {
+  min-width: clamp(48px, 3vw + 22px, 64px);
+  font-size: clamp(14px, 0.5vw + 12px, 17px);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.2);
+  transition: color 150ms;
+  flex-shrink: 0;
+}
+
+.mji-tl-card:hover .mji-tl-month {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* 바디 */
+.mji-tl-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(5px, 0.5vw + 2px, 9px);
+}
+
+.mji-tl-tags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.mji-tag {
+  font-size: clamp(10px, 0.4vw + 8px, 12px);
+  font-weight: 600;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.05);
+  padding: clamp(2px, 0.2vw + 1px, 4px) clamp(7px, 0.5vw + 5px, 11px);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.38);
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+
+.mji-tl-title {
+  font-size: clamp(14px, 0.5vw + 12px, 18px);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0;
+  letter-spacing: -0.01em;
+  line-height: 1.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 150ms;
+}
+
+.mji-tl-card:hover .mji-tl-title {
+  color: rgba(255, 255, 255, 0.98);
+}
+
+.mji-tl-desc {
+  font-size: clamp(12px, 0.4vw + 10px, 15px);
+  color: rgba(255, 255, 255, 0.28);
+  margin: 0;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 호버 액션 슬라이드인 */
+.mji-tl-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 200ms, transform 200ms;
+}
+
+.mji-tl-card:hover .mji-tl-action {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mji-tl-more {
+  font-size: clamp(9px, 0.4vw + 7px, 11px);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.mji-tl-circle {
+  width: clamp(26px, 2vw + 14px, 32px);
+  height: clamp(26px, 2vw + 14px, 32px);
+  border: 0.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.45);
+  transition: border-color 150ms, color 150ms;
+}
+
+.mji-tl-card:hover .mji-tl-circle {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+
+/* =============================================================================
+   반응형
+   ============================================================================= */
+
+@media (max-width: 900px) {
+  .mji-archive-inner {
+    flex-direction: column;
+  }
+
+  .mji-sidebar {
+    width: 100%;
+    position: static;
+    border-right: none;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .mji-sidebar-section {
+    margin-bottom: 0;
+  }
+
+  .mji-sidebar-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .mji-filter-btn {
+    width: auto;
+  }
+
+  .mji-timeline {
+    padding: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .mji-hero {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .mji-nav-inner {
+    padding: 0 1.25rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .mji-logo-badge {
+    display: none;
+  }
+
+  .mji-tl-action {
+    display: none;
+  }
+}
+
+/* =============================================================================
+   Footer
+   ============================================================================= */
+
+.mji-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: #0a0a0a;
+}
+
+.mji-footer-copy {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.mji-footer-credits {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  text-decoration: none;
+  transition: color 200ms;
+}
+
+.mji-footer-credits:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* =============================================================================
+   Credits 페이지
+   ============================================================================= */
+
+.mji-credits-page {
+  min-height: 100vh;
+  background: #0a0a0a;
+  color: rgba(255, 255, 255, 0.87);
+  padding-top: 68px;
+}
+
+.mji-credits-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 5rem 2rem 6rem;
+}
+
+.mji-credits-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 0 0.75rem;
+}
+
+.mji-credits-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0 0 0.75rem;
+}
+
+.mji-credits-desc {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 3.5rem;
+}
+
+.mji-credits-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mji-credit-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 200ms, border-color 200ms;
+}
+
+.mji-credit-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.13);
+}
+
+.mji-credit-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.mji-credit-avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.mji-credit-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.mji-credit-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.mji-credit-id {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.28);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.mji-credit-role {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 2px;
+}
+
+.mji-credit-links {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.mji-credit-link {
+  color: rgba(255, 255, 255, 0.28);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: color 180ms;
+}
+
+.mji-credit-link:hover {
+  color: rgba(255, 255, 255, 0.75);
 }

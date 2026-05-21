@@ -1,36 +1,9 @@
 import type * as types from 'notion-types'
-import cs from 'classnames'
 import * as React from 'react'
-import { Breadcrumbs, Header, Search, useNotionContext } from 'react-notion-x'
+import { useNotionContext } from 'react-notion-x'
 
-import { isSearchEnabled, navigationLinks, navigationStyle } from '@/lib/config'
-import { MoonIcon } from '@/lib/icons/moon'
-import { SunIcon } from '@/lib/icons/sun'
-import { useDarkMode } from '@/lib/use-dark-mode'
+import { navigationLinks } from '@/lib/config'
 
-import styles from './styles.module.css'
-
-function ToggleThemeButton() {
-  const [hasMounted, setHasMounted] = React.useState(false)
-  const { isDarkMode, toggleDarkMode } = useDarkMode()
-
-  React.useEffect(() => {
-    setHasMounted(true)
-  }, [])
-
-  const onToggleTheme = React.useCallback(() => {
-    toggleDarkMode()
-  }, [toggleDarkMode])
-
-  return (
-    <div
-      className={cs('breadcrumb', 'button', !hasMounted && styles.hidden)}
-      onClick={onToggleTheme}
-    >
-      {hasMounted && isDarkMode ? <MoonIcon /> : <SunIcon />}
-    </div>
-  )
-}
 
 export function NotionPageHeader({
   block
@@ -39,28 +12,26 @@ export function NotionPageHeader({
 }) {
   const { components, mapPageUrl } = useNotionContext()
 
-  if (navigationStyle === 'default') {
-    return <Header block={block} />
-  }
-
   return (
-    <header className='notion-header'>
-      <div className='notion-nav-header'>
-        <Breadcrumbs block={block} rootOnly={true} />
+    <header className='notion-header mji-header'>
+      <div className='mji-nav-inner'>
+        <div className='mji-nav-rhs'>
+          <a href='/' className='mji-home-btn' aria-label='홈으로'>
+            <svg width='16' height='16' viewBox='0 0 16 16' fill='none' aria-hidden='true'>
+              <path d='M8 2L2 7.5V14h4.5v-4h3v4H14V7.5L8 2Z' stroke='currentColor' strokeWidth='1.4' strokeLinejoin='round' />
+            </svg>
+            <span>Home</span>
+          </a>
 
-        <div className='notion-nav-header-rhs breadcrumbs'>
           {navigationLinks
             ?.map((link, index) => {
-              if (!link?.pageId && !link?.url) {
-                return null
-              }
-
+              if (!link?.pageId && !link?.url) return null
               if (link.pageId) {
                 return (
                   <components.PageLink
                     href={mapPageUrl(link.pageId)}
                     key={index}
-                    className={cs(styles.navLink, 'breadcrumb', 'button')}
+                    className='mji-nav-link'
                   >
                     {link.title}
                   </components.PageLink>
@@ -70,7 +41,7 @@ export function NotionPageHeader({
                   <components.Link
                     href={link.url}
                     key={index}
-                    className={cs(styles.navLink, 'breadcrumb', 'button')}
+                    className='mji-nav-link'
                   >
                     {link.title}
                   </components.Link>
@@ -78,10 +49,6 @@ export function NotionPageHeader({
               }
             })
             .filter(Boolean)}
-
-          <ToggleThemeButton />
-
-          {isSearchEnabled && <Search block={block} title={null} />}
         </div>
       </div>
     </header>
