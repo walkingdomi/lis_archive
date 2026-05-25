@@ -27,6 +27,7 @@ import { getCanonicalPageUrl, mapPageUrl } from '@/lib/map-page-url'
 import { searchNotion } from '@/lib/search-notion'
 import { useDarkMode } from '@/lib/use-dark-mode'
 
+import { DarkModeToggle } from './DarkModeToggle'
 import { Footer } from './Footer'
 import { HeaderSearch } from './HeaderSearch'
 import { Loading } from './Loading'
@@ -138,6 +139,14 @@ function getSemester(dateStr: string): string {
   return month >= 3 && month <= 8 ? '1학기' : '2학기'
 }
 
+function extractGDriveThumb(url: string): string | undefined {
+  const m1 = url.match(/\/file\/d\/([^/?]+)/)
+  if (m1) return `https://drive.google.com/thumbnail?id=${m1[1]}&sz=w400`
+  const m2 = url.match(/[?&]id=([^&]+)/)
+  if (m2) return `https://drive.google.com/thumbnail?id=${m2[1]}&sz=w400`
+  return undefined
+}
+
 interface ArchiveItem {
   id: string
   title: string
@@ -146,6 +155,7 @@ interface ArchiveItem {
   monthStr: string
   description: string
   url: string
+  cover?: string
 }
 
 function getArchiveItems(
@@ -190,6 +200,9 @@ function getArchiveItems(
     ['description', 'desc', '설명', 'summary', '요약'],
     ['text']
   )
+  const coverPropKey = Object.entries(schema).find(([_, p]) =>
+    ['cover', 'embed'].includes((p.name as string)?.toLowerCase?.())
+  )?.[0]
 
   return Object.values(recordMap.block)
     .filter((b) => {
@@ -224,6 +237,30 @@ function getArchiveItems(
 
       const monthStr = dateStr ? getSemester(dateStr) : ''
 
+      // Cover 프로퍼티에서 썸네일 추출
+      let cover: string | undefined
+      if (coverPropKey && props[coverPropKey]) {
+        const rawUrl: string = props[coverPropKey]?.[0]?.[0] ?? ''
+        if (rawUrl) cover = extractGDriveThumb(rawUrl) ?? rawUrl
+      }
+
+      // Cover 프로퍼티 없으면 embed/pdf 블록에서 추출
+      if (!cover) {
+        const content: string[] = page.content || []
+        for (const childId of content) {
+          const childEntry = recordMap.block[childId]
+          if (!childEntry) continue
+          const child = getBlockValue(childEntry as any) as any
+          if (child && (child.type === 'embed' || child.type === 'pdf')) {
+            const srcUrl: string = child.properties?.source?.[0]?.[0] ?? ''
+            if (srcUrl) {
+              cover = extractGDriveThumb(srcUrl) || undefined
+              if (cover) break
+            }
+          }
+        }
+      }
+
       return {
         id: page.id,
         title,
@@ -231,7 +268,8 @@ function getArchiveItems(
         dateStr,
         monthStr,
         description,
-        url: urlMapper(page.id)
+        url: urlMapper(page.id),
+        cover
       }
     })
     .filter((item) => item.title)
@@ -506,6 +544,12 @@ function ArchiveSection({
                       <p className='mji-tl-desc'>{item.description}</p>
                     )}
                   </div>
+                  {item.cover && (
+                    <div className='mji-tl-thumb'>
+                      <img src={item.cover} alt='' loading='lazy' />
+                      <div className='mji-thumb-fade' />
+                    </div>
+                  )}
                   <div className='mji-tl-action'>
                     <span className='mji-tl-more'>More</span>
                     <div className='mji-tl-circle'>
@@ -547,6 +591,7 @@ function SiteHeader() {
         <div className='mji-nav-rhs'>
           <HeaderSearch />
         </div>
+        <DarkModeToggle />
       </div>
     </header>
   )
@@ -631,7 +676,7 @@ export function NotionPage({
   const lite = useSearchParam('lite')
   const isLiteMode = lite === 'true'
 
-  const { isDarkMode } = useDarkMode()
+  const { isDarkMode, mounted: darkModeMounted } = useDarkMode()
 
   const siteMapPageUrl = React.useMemo(() => {
     const params: any = {}
@@ -745,7 +790,9 @@ export function NotionPage({
       />
 
       {isLiteMode && <BodyClassName className='notion-lite' />}
-      {isDarkMode && <BodyClassName className='dark-mode' />}
+      {darkModeMounted && (isDarkMode
+        ? <BodyClassName className='dark-mode' />
+        : <BodyClassName className='light-mode' />)}
 
       <NotionRenderer
         bodyClassName={cs(

@@ -2,7 +2,10 @@ import useDarkModeImpl from '@fisch0920/use-dark-mode'
 import * as React from 'react'
 
 export function useDarkMode() {
-  const darkMode = useDarkModeImpl(true, { classNameDark: 'dark-mode' })
+  const darkMode = useDarkModeImpl(true, {
+    classNameDark: 'dark-mode',
+    classNameLight: 'light-mode'
+  })
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
@@ -11,6 +14,7 @@ export function useDarkMode() {
 
   return {
     isDarkMode: mounted ? darkMode.value : false,
-    toggleDarkMode: darkMode.toggle
+    toggleDarkMode: darkMode.toggle,
+    mounted
   }
 }

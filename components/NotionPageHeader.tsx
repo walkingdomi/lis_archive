@@ -4,6 +4,7 @@ import { useNotionContext } from 'react-notion-x'
 
 import { navigationLinks } from '@/lib/config'
 
+import { DarkModeToggle } from './DarkModeToggle'
 
 export function NotionPageHeader({
   block
@@ -50,6 +51,8 @@ export function NotionPageHeader({
             })
             .filter(Boolean)}
         </div>
+
+        <DarkModeToggle />
       </div>
     </header>
   )
