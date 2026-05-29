@@ -305,10 +305,13 @@ function getArchiveItems(
 // -----------------------------------------------------------------------------
 
 const HERO_LINES = ['안녕하세요!', '명지대학교 문헌정보학과', '아카이브입니다.']
+const HERO_SUB = '문헌정보학과 학생들의 활동들을 아카이브에서 확인해보세요.'
 
 function HeroSection() {
   const [displayed, setDisplayed] = React.useState<string[]>([])
   const [done, setDone] = React.useState(false)
+  const [subDisplayed, setSubDisplayed] = React.useState('')
+  const [subDone, setSubDone] = React.useState(false)
 
   React.useEffect(() => {
     let lineIdx = 0
@@ -348,6 +351,25 @@ function HeroSection() {
     return () => clearTimeout(timerId)
   }, [])
 
+  React.useEffect(() => {
+    if (!done) return
+    let charIdx = 0
+    let timerId: ReturnType<typeof setTimeout>
+
+    function tickSub() {
+      charIdx++
+      setSubDisplayed(HERO_SUB.slice(0, charIdx))
+      if (charIdx < HERO_SUB.length) {
+        timerId = setTimeout(tickSub, 35)
+      } else {
+        setSubDone(true)
+      }
+    }
+
+    timerId = setTimeout(tickSub, 400)
+    return () => clearTimeout(timerId)
+  }, [done])
+
   return (
     <section className='mji-hero' id='hero'>
       <div className='mji-hero-content'>
@@ -370,7 +392,7 @@ function HeroSection() {
         </h1>
 
         <p className='mji-hero-sub'>
-          문헌정보학과 학생들의 프로젝트, 우수과제, 학술제 등 활동 자료를 이 곳에서 확인해보세요.
+          {subDisplayed}
         </p>
 
         <div className='mji-hero-buttons'>

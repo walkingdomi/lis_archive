@@ -62,6 +62,9 @@ export default function CreditsPage() {
                     )}
                   </div>
                 </div>
+                {m.year && (
+                  <span className='mji-credit-year' aria-hidden='true'>{m.year}</span>
+                )}
               </div>
             ))}
           </div>

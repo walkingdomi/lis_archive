@@ -1353,6 +1353,21 @@ body {
   color: rgba(255, 255, 255, 0.75);
 }
 
+.mji-credit-year {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+
 /* =============================================================================
    라이트 테마 오버라이드
    ============================================================================= */
@@ -1676,6 +1691,11 @@ body.light-mode {
 .light-mode .mji-credit-link {
   color: rgba(0, 0, 0, 0.3);
 }
+
+.light-mode .mji-credit-year {
+  color: rgba(0, 0, 0, 0.25);
+}
+
 
 .light-mode .mji-credit-link:hover {
   color: rgba(0, 0, 0, 0.75);
