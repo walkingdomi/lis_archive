@@ -21,7 +21,7 @@ export const members: Member[] = [
     studentId: '60230295',
     role: '사이트 개발 및 콘텐츠 관리',
     year: '2026 ~ present',
-    github: 'inye3am',
+    github: 'ye3am',
     email: 'yxsxux@mju.ac.kr'
   }
 ]
