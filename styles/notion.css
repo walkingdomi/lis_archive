@@ -1180,25 +1180,115 @@ body {
   }
 }
 
-@media (max-width: 440px) {
-  .mji-logo-badge {
+@media (max-width: 767px) {
+  /* 히어로 */
+  .mji-hero {
+    min-height: 100vh;
+    padding-top: 80px;
+    padding-bottom: 40px;
+  }
+
+  .mji-hero-title {
+    font-size: clamp(1.8rem, 7vw, 2.4rem);
+    word-break: keep-all;
+  }
+
+  /* 연도 라벨: 섹션 헤딩처럼 작고 흐리게 */
+  .mji-year-row {
+    padding: 12px 16px 8px;
+    margin-bottom: 12px;
+  }
+
+  .mji-year-label {
+    font-size: 28px;
+  }
+
+  /* 카드: 보더 스타일 */
+  .mji-tl-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    min-height: 0;
+    margin: 0 16px 10px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: none;
+    border: 0.5px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .mji-tl-card-last {
+    border-bottom: none;
+  }
+
+  /* 카드 순서: month(0) → thumb(1) → body(2) */
+  .mji-tl-month {
     display: none;
   }
 
-  .mji-tl-action,
   .mji-tl-thumb {
+    position: static;
+    width: 100%;
+    height: auto;
+    order: 1;
+    display: block;
+    opacity: 1 !important;
+  }
+
+  .mji-tl-thumb img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .mji-thumb-fade {
     display: none;
+  }
+
+  .mji-tl-card:hover .mji-tl-thumb {
+    opacity: 1;
   }
 
   .mji-tl-body {
-    padding-right: 0;
+    order: 2;
+    padding: 12px 16px 16px;
+    padding-right: 16px;
   }
 
+  /* body 내부 순서: title(1) → desc(2) → tags(3) */
   .mji-tl-title {
-    white-space: nowrap;
+    order: 1;
+    white-space: normal;
+    word-break: keep-all;
     display: block;
-    -webkit-line-clamp: unset;
-    -webkit-box-orient: unset;
+    overflow: visible;
+  }
+
+  .mji-tl-desc {
+    order: 2;
+    white-space: normal;
+    word-break: keep-all;
+  }
+
+  .mji-tl-tags {
+    order: 3;
+    margin-top: 8px;
+  }
+
+  .mji-tl-action {
+    display: none;
+  }
+
+  /* 라이트 모드 카드 테두리 */
+  .light-mode .mji-tl-card {
+    border: 0.5px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  /* 사이드바 필터 버튼 줄바꿈 */
+  .mji-filter-group {
+    flex-wrap: wrap;
   }
 }
 
