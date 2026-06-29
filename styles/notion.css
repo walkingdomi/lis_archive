@@ -1184,7 +1184,10 @@ body {
   /* 히어로 */
   .mji-hero {
     min-height: 100vh;
-    padding-top: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 68px;
     padding-bottom: 40px;
   }
 
